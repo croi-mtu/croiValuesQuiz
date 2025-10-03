@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Croí Values Questionnaire</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5ede3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00a99d 0%, #008c82 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            display: inline-block;
+            padding: 8px 24px;
+            border: 2px solid white;
+            border-radius: 25px;
+            font-size: 1.8em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: lowercase;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .progress-container {
+            background: #f0f0f0;
+            height: 6px;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #00a99d 0%, #00d4c5 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .question-card {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            color: #00a99d;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .rating-scale {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .rating-option {
+            text-align: center;
+        }
+
+        .rating-option input[type="radio"] {
+            display: none;
+        }
+
+        .rating-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 8px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 70px;
+        }
+
+        .rating-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .rating-label-text {
+            font-size: 0.7em;
+            color: #999;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .rating-option label:hover {
+            background: #e8f5f3;
+            border-color: #00a99d;
+        }
+
+        .rating-option input[type="radio"]:checked + label {
+            background: #00a99d;
+            border-color: #00a99d;
+            transform: scale(1.05);
+        }
+
+        .rating-option input[type="radio"]:checked + label .rating-number,
+        .rating-option input[type="radio"]:checked + label .rating-label-text {
+            color: white;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #d0d0d0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00a99d 0%, #00d4c5 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 169, 157, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .results-header h2 {
+            color: #00a99d;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        canvas {
+            max-height: 100%;
+        }
+
+        .values-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .value-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .value-item:hover {
+            transform: translateX(5px);
+        }
+
+        .value-item.top {
+            background: linear-gradient(135deg, #00a99d15 0%, #00d4c515 100%);
+            border-left: 4px solid #00a99d;
+        }
+
+        .value-item.medium {
+            background: #ffecd1;
+            border-left: 4px solid #f5a962;
+        }
+
+        .value-item.low {
+            background: #ffe8e8;
+            border-left: 4px solid #e57373;
+        }
+
+        .value-name {
+            flex: 1;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .value-score {
+            font-size: 1.5em;
+            font-weight: 700;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .value-item.top .value-score {
+            color: #00a99d;
+        }
+
+        .value-item.medium .value-score {
+            color: #f5a962;
+        }
+
+        .value-item.low .value-score {
+            color: #e57373;
+        }
+
+        .restart-btn {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .print-btn {
+            margin-top: 15px;
+            width: 100%;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .print-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .header {
+                background: white !important;
+                color: #00a99d !important;
+                border-bottom: 2px solid #00a99d;
+                page-break-after: avoid;
+                padding: 15px !important;
+            }
+
+            .logo {
+                border-color: #00a99d !important;
+                color: #00a99d !important;
+                font-size: 1.2em !important;
+                margin-bottom: 8px !important;
+                padding: 6px 18px !important;
+            }
+
+            .header h1 {
+                font-size: 1.6em !important;
+                margin-bottom: 3px !important;
+            }
+
+            .header p {
+                font-size: 0.85em !important;
+            }
+
+            .content {
+                padding: 15px !important;
+            }
+
+            .results-header {
+                margin-bottom: 12px !important;
+            }
+
+            .results-header h2 {
+                font-size: 1.3em !important;
+                margin-bottom: 3px !important;
+            }
+
+            .results-header p {
+                font-size: 0.85em !important;
+            }
+
+            .progress-container,
+            .restart-btn,
+            .print-btn,
+            .nav-buttons {
+                display: none !important;
+            }
+
+            .chart-container {
+                page-break-inside: avoid;
+                height: 280px !important;
+                margin-bottom: 15px !important;
+                padding: 5px !important;
+            }
+
+            .values-list {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 6px !important;
+                column-gap: 12px !important;
+            }
+
+            .value-item {
+                page-break-inside: avoid;
+                margin-bottom: 0 !important;
+                padding: 10px 12px !important;
+                border-radius: 6px !important;
+            }
+
+            .value-name {
+                font-size: 0.88em !important;
+            }
+
+            .value-score {
+                font-size: 1.1em !important;
+                min-width: 50px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .rating-scale {
+                gap: 6px;
+            }
+
+            .rating-option label {
+                padding: 15px 5px;
+                min-height: 75px;
+            }
+
+            .rating-number {
+                font-size: 1.6em;
+            }
+
+            .rating-label-text {
+                font-size: 0.65em;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .rating-scale {
+                gap: 4px;
+            }
+
+            .rating-option label {
+                padding: 12px 4px;
+            }
+
+            .rating-number {
+                font-size: 1.4em;
+            }
+
+            .scale-labels {
+                font-size: 0.75em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">croí</div>
+            <h1>Values Questionnaire</h1>
+            <p>Discover what matters most to you</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <div id="questionnaire"></div>
+
+            <div class="results" id="results">
+                <div class="results-header">
+                    <h2>Your Value Profile</h2>
+                    <p>Here are your top values based on your responses</p>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <div class="values-list" id="valuesList"></div>
+
+                <button class="btn btn-primary restart-btn" onclick="restartQuestionnaire()">Take Again</button>
+                <button class="btn print-btn" onclick="window.print()">Print Results (PDF)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {id: 1, text: "It is important to me to form my views independently", category: "Self-direction - thought"},
+            {id: 2, text: "It is important to me that my country is secure and stable.", category: "Security Societal"},
+            {id: 3, text: "It is important to me to have a good time.", category: "Hedonism"},
+            {id: 4, text: "It is important to me to avoid upsetting other people.", category: "Conformity Interpersonal"},
+            {id: 5, text: "It is important to me that the weak and vulnerable in society be protected", category: "Universalism Concern"},
+            {id: 6, text: "It is important to me that people do what I say they should.", category: "Power Dominance"},
+            {id: 7, text: "It is important to me never to think I deserve more than other people.", category: "Humility"},
+            {id: 8, text: "It is important to me to care for nature.", category: "Universalism Nature"},
+            {id: 9, text: "It is important to me that no one should ever shame me", category: "Face"},
+            {id: 10, text: "It is important to me always to look for different things to do.", category: "Stimulation"},
+            {id: 11, text: "It is important to me to take care of people I am close to.", category: "Benevolence Care"},
+            {id: 12, text: "It is important to me to have the power that money can bring.", category: "Power Resources"},
+            {id: 13, text: "It is very important to me to avoid disease and protect my health.", category: "Security Personal"},
+            {id: 14, text: "It is important to me to be tolerant toward all kinds of people and groups.", category: "Universalism Tolerance"},
+            {id: 15, text: "It is important to me never to violate rules or regulations.", category: "Conformity Rules"},
+            {id: 16, text: "It is important to me to make my own decisions about my life", category: "Self-direction - action"},
+            {id: 17, text: "It is important to me to have ambitions in life.", category: "Achievement"},
+            {id: 18, text: "It is important to me to maintain traditional values and ways of thinking.", category: "Tradition"},
+            {id: 19, text: "It is important to me that people I know have full confidence in me.", category: "Benevolence Dependability"},
+            {id: 20, text: "It is important to me to be wealthy.", category: "Power Resources"},
+            {id: 21, text: "It is important to me to take part in activities to defend nature.", category: "Universalism Nature"},
+            {id: 22, text: "It is important to me never to annoy anyone.", category: "Conformity Interpersonal"},
+            {id: 23, text: "It is important to me to develop my own opinions.", category: "Self-direction - thought"},
+            {id: 24, text: "It is important to me to protect my public image.", category: "Face"},
+            {id: 25, text: "It is very important to me to help the people dear to me.", category: "Benevolence Care"},
+            {id: 26, text: "It is important to me to be personally safe and secure.", category: "Security Personal"},
+            {id: 27, text: "It is important to me to be a dependable and trustworthy friend.", category: "Benevolence Dependability"},
+            {id: 28, text: "It is important to me to take risks that make life exciting", category: "Stimulation"},
+            {id: 29, text: "It is important to me to have the power to make people do what I want.", category: "Power Dominance"},
+            {id: 30, text: "It is important to me to plan my activities independently.", category: "Self-direction - action"},
+            {id: 31, text: "It is important to me to follow rules even when no-one is watching.", category: "Conformity Rules"},
+            {id: 32, text: "It is important to me to be very successful.", category: "Achievement"},
+            {id: 33, text: "It is important to me to follow my family's customs or the customs of a religion.", category: "Tradition"},
+            {id: 34, text: "It is important to me to listen to and understand people who are different from me", category: "Universalism Tolerance"},
+            {id: 35, text: "It is important to me to have a strong state that can defend its citizens.", category: "Security Societal"},
+            {id: 36, text: "It is important to me to enjoy life's pleasures.", category: "Hedonism"},
+            {id: 37, text: "It is important to me that every person in the world have equal opportunities in life.", category: "Universalism Concern"},
+            {id: 38, text: "It is important to me to be humble.", category: "Humility"},
+            {id: 39, text: "It is important to me to figure things out myself", category: "Self-direction - thought"},
+            {id: 40, text: "It is important to me to honor the traditional practices of my culture.", category: "Tradition"},
+            {id: 41, text: "It is important to me to be the one who tells others what to do.", category: "Power Dominance"},
+            {id: 42, text: "It is important to me to obey all the laws.", category: "Conformity Rules"},
+            {id: 43, text: "It is important to me to have all sorts of new experiences.", category: "Stimulation"},
+            {id: 44, text: "It is important to me to own expensive things that show my wealth", category: "Power Resources"},
+            {id: 45, text: "It is important to me to protect the natural environment from destruction or pollution.", category: "Universalism Nature"},
+            {id: 46, text: "It is important to me to take advantage of every opportunity to have fun.", category: "Hedonism"},
+            {id: 47, text: "It is important to me to concern myself with every need of my dear ones.", category: "Benevolence Care"},
+            {id: 48, text: "It is important to me that people recognize what I achieve", category: "Achievement"},
+            {id: 49, text: "It is important to me never to be humiliated.", category: "Face"},
+            {id: 50, text: "It is important to me that my country protects itself against all threats.", category: "Security Societal"},
+            {id: 51, text: "It is important to me never to make other people angry.", category: "Conformity Interpersonal"},
+            {id: 52, text: "It is important to me that everyone be treated justly, even people I don't know.", category: "Universalism Concern"},
+            {id: 53, text: "It is important to me to avoid anything dangerous.", category: "Security Personal"},
+            {id: 54, text: "It is important to me to be satisfied with what I have and not ask for more.", category: "Humility"},
+            {id: 55, text: "It is important to me that all my friends and family can rely on me completely.", category: "Benevolence Dependability"},
+            {id: 56, text: "It is important to me to be free to choose what I do by myself.", category: "Self-direction - action"},
+            {id: 57, text: "It is important to me to accept people even when they disagree with me.", category: "Universalism Tolerance"}
+        ];
+
+        let currentQuestion = 0;
+        let responses = {};
+
+        function initQuestionnaire() {
+            const container = document.getElementById('questionnaire');
+            container.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card' + (index === 0 ? ' active' : '');
+                card.innerHTML = `
+                    <div class="question-number">Question ${index + 1} of ${questions.length}</div>
+                    <div class="question-text">${q.text}</div>
+                    <div class="rating-scale">
+                        ${[1, 2, 3, 4, 5, 6].map(rating => `
+                            <div class="rating-option">
+                                <input type="radio" id="q${q.id}_r${rating}" name="q${q.id}" value="${rating}" onchange="handleResponse(${q.id}, ${rating})">
+                                <label for="q${q.id}_r${rating}">
+                                    <div class="rating-number">${rating}</div>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="scale-labels">
+                        <span>← Not like me at all</span>
+                        <span>Very much like me →</span>
+                    </div>
+                    <div class="nav-buttons">
+                        <button class="btn btn-secondary" onclick="previousQuestion()" ${index === 0 ? 'style="visibility: hidden;"' : ''}>Previous</button>
+                        <button class="btn btn-primary" id="nextBtn${index}" onclick="nextQuestion()" disabled>${index === questions.length - 1 ? 'See Results' : 'Next'}</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        function handleResponse(questionId, rating) {
+            responses[questionId] = rating;
+            const btn = document.getElementById(`nextBtn${currentQuestion}`);
+            btn.disabled = false;
+            updateProgress();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                document.querySelectorAll('.question-card')[currentQuestion].classList.remove('active');
+                currentQuestion++;
+                document.querySelectorAll('.question-card')[currentQuestion].classList.add('active');
+                updateProgress();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                document.querySelectorAll('.question-card')[currentQuestion].classList.remove('active');
+                currentQuestion--;
+                document.querySelectorAll('.question-card')[currentQuestion].classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const answeredCount = Object.keys(responses).length;
+            const percentage = (answeredCount / questions.length) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        function calculateResults() {
+            const categoryScores = {};
+            
+            questions.forEach(q => {
+                if (!categoryScores[q.category]) {
+                    categoryScores[q.category] = [];
+                }
+                if (responses[q.id]) {
+                    categoryScores[q.category].push(responses[q.id]);
+                }
+            });
+
+            const results = {};
+            Object.keys(categoryScores).forEach(category => {
+                const scores = categoryScores[category];
+                const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                results[category] = Number(avg.toFixed(2));
+            });
+
+            return results;
+        }
+
+        function showResults() {
+            const results = calculateResults();
+            const sortedResults = Object.entries(results).sort((a, b) => b[1] - a[1]);
+
+            document.getElementById('questionnaire').style.display = 'none';
+            document.getElementById('results').classList.add('active');
+
+            displayChart(results);
+            displayValuesList(sortedResults);
+        }
+
+        function displayChart(results) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            const labels = Object.keys(results);
+            const data = Object.values(results);
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Your Values',
+                        data: data,
+                        backgroundColor: 'rgba(0, 169, 157, 0.2)',
+                        borderColor: '#00a99d',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#00a99d',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#00a99d'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 6,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayValuesList(sortedResults) {
+            const container = document.getElementById('valuesList');
+            container.innerHTML = sortedResults.map(([category, score]) => {
+                let tier = 'low';
+                if (score >= 4.5) tier = 'top';
+                else if (score >= 3.0) tier = 'medium';
+
+                return `
+                    <div class="value-item ${tier}">
+                        <div class="value-name">${category}</div>
+                        <div class="value-score">${score}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function restartQuestionnaire() {
+            currentQuestion = 0;
+            responses = {};
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('questionnaire').style.display = 'block';
+            initQuestionnaire();
+        }
+
+        initQuestionnaire();
+    </script>
+</body>
+</html>
