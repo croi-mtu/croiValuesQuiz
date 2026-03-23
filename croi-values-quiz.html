@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Croí Values Questionnaire</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous"></script>
     <style>
         * {
             margin: 0;
@@ -643,7 +643,7 @@
                     <div class="welcome-section">
                         <h3>Understanding Your Results</h3>
                         <p>After completing the questionnaire, you'll receive a personalized value profile showing your top values. Click on any value in your results to learn more about what it means.</p>
-                        <p>For a complete guide to all 19 values, download the <a href="https://drive.google.com/file/d/1UP6dS-9Yv-uC_YHpOXsMySirQ0yMowaV/view" target="_blank" style="color: #00a99d; text-decoration: none;">Croí Values Thesaurus (PDF)</a>.</p>
+                        <p>For a complete guide to all 19 values, download the <a href="https://drive.google.com/file/d/1UP6dS-9Yv-uC_YHpOXsMySirQ0yMowaV/view" target="_blank" rel="noopener noreferrer" style="color: #00a99d; text-decoration: none;">Croí Values Thesaurus (PDF)</a>.</p>
                     </div>
 
                     <div class="attribution-box">
@@ -667,9 +667,9 @@
 
                     <div class="links-section">
                         <h4>Learn More About Croí</h4>
-                        <a href="https://www.youtube.com/watch?v=d_nk_iKRr-I&list=PLBXrWAq3msj_Lj04FAqdcVjJOwdd5BijW" target="_blank">→ Croí YouTube Playlist</a>
-                        <a href="https://campsite.bio/croimtu" target="_blank">→ Croí Resources & Links</a>
-                        <a href="https://pressbooks.oer.ie/leading-change-together-teaching-learning-conference-2025/chapter/croi-your-life-your-career-embedding-values-for-sustainable-professional-development/" target="_blank">→ HEA Resource Hub Case Study</a>
+                        <a href="https://www.youtube.com/watch?v=d_nk_iKRr-I&list=PLBXrWAq3msj_Lj04FAqdcVjJOwdd5BijW" target="_blank" rel="noopener noreferrer">→ Croí YouTube Playlist</a>
+                        <a href="https://campsite.bio/croimtu" target="_blank" rel="noopener noreferrer">→ Croí Resources & Links</a>
+                        <a href="https://pressbooks.oer.ie/leading-change-together-teaching-learning-conference-2025/chapter/croi-your-life-your-career-embedding-values-for-sustainable-professional-development/" target="_blank" rel="noopener noreferrer">→ HEA Resource Hub Case Study</a>
                     </div>
 
                     <div class="welcome-section">
@@ -679,7 +679,7 @@
 
                     <div class="attribution-box" style="background: #f8f9fa; border-color: #6c757d;">
                         <h4 style="color: #495057;">Privacy & Data</h4>
-                        <p>Your responses are processed entirely in your browser and are not stored, transmitted, or shared. No personal data is collected. You can print or save your results for your own records. This questionnaire is for educational and personal development purposes.</p>
+                        <p>Your questionnaire responses are processed entirely in your browser and are not sent by this application. This page does load external resources (Chart.js library) and includes links to third-party sites. No personal data is collected or stored. You can print or save your results for your own records. This questionnaire is for educational and personal development purposes.</p>
                     </div>
 
                     <button class="btn btn-primary start-button" onclick="startQuestionnaire()">Start Questionnaire</button>
@@ -854,6 +854,7 @@
 
         function startQuestionnaire() {
             document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('questionnaire').style.display = 'block';
             document.getElementById('progressBar').parentElement.style.display = 'block';
             initQuestionnaire();
         }
